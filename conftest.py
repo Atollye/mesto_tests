@@ -1,7 +1,9 @@
+import requests
 import pytest
 from pymongo import MongoClient
 
-from data.const_and_func import SERVER_ADDRESS
+from api_helpers.const_and_func import SERVER_ADDRESS, check_response
+from api_helpers.wrapper import MainWrapper
 
 
 @pytest.fixture
@@ -29,4 +31,22 @@ def clear_users_from_mongo():
         print("Setup is not sucessful: not all users are deleted")
 
 
+@pytest.fixture
+def client(clear_users_from_mongo):
+    cl = MainWrapper()
+    url = cl.url +'/signup'
+    cl.headers = {"Content-Type": "application/json"}
+    cl.data = {"email":"user@user.com", "password":"password"
+    }
+    resp = requests.post(url, headers = cl.headers, json=cl.data)
+    check_response(resp.status_code, 201, resp_text=resp.text)
+    url = cl.url +'/signin'
+    resp = requests.post(url, headers = cl.headers, json=cl.data)
+    token = resp.json().get("token")
+    cl.headers["Cookie"] = f"jwt={token}; path=/; HttpOnly"
+    cl.token = token
+    return cl
 
+@pytest.fixture
+def generate_custom_users(client):
+    print("stub")
