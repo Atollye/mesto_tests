@@ -2,7 +2,7 @@ import requests
 import pytest
 from pymongo import MongoClient
 
-from api_helpers.const_and_func import SERVER_ADDRESS, check_response
+from api_helpers.const_and_func import BASE_URL, SERVER_ADDRESS, check_response
 from api_helpers.wrapper import MainWrapper
 
 
@@ -30,23 +30,44 @@ def clear_users_from_mongo():
     else:
         print("Setup is not sucessful: not all users are deleted")
 
+@pytest.fixture
+def signup(clear_users_from_mongo):
+    url = BASE_URL +'/signup'
+    headers = {"Content-Type": "application/json"}
+    payload = {"email":"user@user.com", "password":"password"}
+    resp = requests.post(url, headers = headers, json=payload)
+    check_response(resp.status_code, 201, resp.text)
+    mail = resp.json().get("email")
+    assert mail == "user@user.com", "Setup: signup doesn't work"
+
 
 @pytest.fixture
-def client(clear_users_from_mongo):
+def client(signup):
     cl = MainWrapper()
-    url = cl.url +'/signup'
-    cl.headers = {"Content-Type": "application/json"}
+    cl.url =  cl.base_url +'/signin'
     cl.data = {"email":"user@user.com", "password":"password"
     }
-    resp = requests.post(url, headers = cl.headers, json=cl.data)
-    check_response(resp.status_code, 201, resp_text=resp.text)
-    url = cl.url +'/signin'
-    resp = requests.post(url, headers = cl.headers, json=cl.data)
+    resp = cl.POST()
+    check_response(resp.status_code, 200, resp_text=resp.text)
     token = resp.json().get("token")
     cl.headers["Cookie"] = f"jwt={token}; path=/; HttpOnly"
     cl.token = token
     return cl
 
+
 @pytest.fixture
-def generate_custom_users(client):
-    print("stub")
+def generate_more_users():
+    url = BASE_URL + '/signup'
+    users = [
+        {"email":"user_one@user.com", "password":"password"},
+        {"email":"user_two@user.com", "password":"password"}   
+    ]
+    headers = {"Content-Type": "application/json"}
+    for user in users:
+        data = user
+        resp = requests.post(url, headers=headers, json=data)
+        check_response(
+            resp.status_code, 201, resp_text="Невозможно создать пользователя"
+        )
+
+

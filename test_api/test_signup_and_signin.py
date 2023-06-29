@@ -1,10 +1,10 @@
 import pytest
 import requests
-from api_helpers.const_and_func import SERVER_ADDRESS, check_response
+from api_helpers.const_and_func import BASE_URL, check_response
 
 
 def test_signup_with_minimal_correct_data(clear_users_from_mongo):
-    url = f'http://{SERVER_ADDRESS}:3003/signup'
+    url = f'http://{BASE_URL}:3003/signup'
     headers = {
         "Content-Type": "application/json"
     }
