@@ -1,0 +1,7 @@
+__pycache__/
+.pytest_chache/
+*pycache*
+*pyc
+*chache
+
+
