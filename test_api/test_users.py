@@ -1,5 +1,6 @@
 import pytest
 import requests
+import logging
 from api_helpers.const_and_func import BASE_URL, check_response
 
 @pytest.fixture
@@ -11,11 +12,12 @@ def generate_several_users():
     ]
     headers = {"Content-Type": "application/json"}
     for user in users:
-        data = user
-        resp = requests.post(url, headers=headers, json=data)
+        resp = requests.post(url, headers=headers, json=user)
         check_response(
             resp.status_code, 201, resp_text="Невозможно создать пользователя"
         )
+        logging.info(f"User with {user} is created")
+
 
 @pytest.fixture
 def get_users_from_mongo():
@@ -45,4 +47,6 @@ def test_get_user_by_id(client, generate_more_users):
 
 def test_get_current_user(client, generate_more_users):
     pass
+
+
 
