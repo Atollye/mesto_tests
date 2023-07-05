@@ -23,12 +23,12 @@ def clear_users_from_mongo():
     db = client.mestodb
     collection = db["users"]
     collection.delete_many({})
-    print("\n")
     user = collection.find_one()
     if user is None:
-        print("Setup: all users are deleted")
+        print("\nSetup: all users are deleted")
     else:
-        print("Setup is not sucessful: not all users are deleted")
+        print("\nSetup is not sucessful: not all users are deleted")
+
 
 @pytest.fixture
 def signup(clear_users_from_mongo):
@@ -55,19 +55,6 @@ def client(signup):
     return cl
 
 
-@pytest.fixture
-def generate_more_users():
-    url = BASE_URL + '/signup'
-    users = [
-        {"email":"user_one@user.com", "password":"password"},
-        {"email":"user_two@user.com", "password":"password"}   
-    ]
-    headers = {"Content-Type": "application/json"}
-    for user in users:
-        data = user
-        resp = requests.post(url, headers=headers, json=data)
-        check_response(
-            resp.status_code, 201, resp_text="Невозможно создать пользователя"
-        )
+
 
 
