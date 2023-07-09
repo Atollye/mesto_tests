@@ -36,9 +36,7 @@ class MainWrapper:
 
     def PUT(self):
         pass
-
-    
-
+ 
     def DELETE(self):
         pass
 

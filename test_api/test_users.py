@@ -1,6 +1,8 @@
-import pytest
-import requests
 import logging
+
+import requests
+import pytest
+
 from api_helpers.const_and_func import BASE_URL, check_response, wait_while
 
 
@@ -55,31 +57,13 @@ def test_patch_current_user(client):
     client.url = BASE_URL +'/users/me'
     updates = {"name":"Васко де Гама","about":"Мореплаватель"}
     client.data = updates
-    resp = client.PATCH()
-    for k, v in updates.items():
-        assert resp.json().get(k) == v
-    print(client.headers)
-
-
-
-
-
-   
-   # 
-    # assert result, "It's impossible to patch a user"
-    # client.GET()
-    # assert user_dict = returned_user_dict, "The user is patched incorrectly"
-   
-    
-"""
-def test_patch_current_user(client):
-    client.path = "+= /users/me"
     def patch_users():
         resp = client.PATCH()
-        if resp.status_code = 200:
+        if resp.status_code == 200:
             return True
-    result = wait_while(patch_users)
-    assert result, "It's impossible to patch a user"
-    client.GET()
-    assert user_dict = returned_user_dict, "The user is patched incorrectly"
-"""
+    is_patched = wait_while(patch_users)
+    assert is_patched, "It's impossible to patch a user"
+    resp = client.GET().json()
+    for k, v in updates.items():
+        assert resp.get(k) == v, "The user is patched incorrectly"
+
