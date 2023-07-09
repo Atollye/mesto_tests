@@ -18,7 +18,6 @@ def test_signup_with_invalid_json():
     }
     payload = INVALID_JSON
     resp = requests.post(url, headers=headers, data=payload)
-    print(resp, resp.text)
 
 
 @pytest.mark.parametrize("mail, expected_user_mail", [

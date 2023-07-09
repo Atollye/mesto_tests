@@ -10,7 +10,7 @@ class MainWrapper:
         self.base_url = BASE_URL
         self.url = ''
         self.token = None
-        self.headers = None
+        self.headers = {}
         self.data = None
 
 
@@ -23,13 +23,16 @@ class MainWrapper:
         return resp
 
     def POST(self):
-        self.headers = {"Content-Type": "application/json"}
-        resp = requests.post(url=self.url, headers=self.headers, json=self.data)
-        self.headers = {}
+        hdrs = self.headers.copy()
+        hdrs.update({"Content-Type": "application/json"})
+        resp = requests.post(url=self.url, headers=hdrs, json=self.data)
         return resp
 
+
     def PATCH(self):
-        pass
+        hdrs = self.headers.copy()
+        hdrs.update({"Content-Type": "application/json"})
+        return requests.patch(url=self.url, headers=hdrs, json=self.data)
 
     def PUT(self):
         pass
