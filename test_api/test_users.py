@@ -3,13 +3,13 @@ import logging
 import requests
 import pytest
 
-from api_helpers.const_and_func import BASE_URL, check_response, wait_while
+from api_helpers.const_and_func import check_response, wait_while
 
 
 
 @pytest.fixture
-def generate_several_users():
-    url = BASE_URL + '/signup'
+def generate_several_users(base_url):
+    url = base_url + '/signup'
     users = [
         {"email":"user_one@user.com", "password":"password"},
         {"email":"user_two@user.com", "password":"password"}   
@@ -22,20 +22,19 @@ def generate_several_users():
         )
         logging.info(f"User with {user} is created")
 
-
 @pytest.fixture
-def get_users_from_mongo():
-    client = MongoClient(f'mongodb://{SERVER_ADDRESS}', 27017)
+def get_users_from_mongo(ip):
+    client = MongoClient(f'mongodb://{ip}', 27017)
     db = client.mestodb
     collection = db["users"]
     users= collection.find()
-    print("\n")
     for user in users:
         print(user)
 
 
+
 def test_get_users_valid_values(client, generate_several_users):
-    client.url = BASE_URL +'/users'
+    client.url = client.base_url +'/users'
     resp = client.GET()
     check_response(resp.status_code, 200, resp.text)
     users = resp.json()
@@ -46,15 +45,15 @@ def test_get_users_valid_values(client, generate_several_users):
         users[2]["email"] == "user_two@user.com"
     ])
 
-def test_get_user_by_id(client, generate_more_users):
-    pass
+def test_get_user_by_id(client, generate_several_users):
+    assert True
 
-def test_get_current_user(client, generate_more_users):
-    pass
+def test_get_current_user(client, generate_several_users):
+    assert True
 
 
 def test_patch_current_user(client):
-    client.url = BASE_URL +'/users/me'
+    client.url = client.base_url +'/users/me'
     updates = {"name":"Васко де Гама","about":"Мореплаватель"}
     client.data = updates
     def patch_users():

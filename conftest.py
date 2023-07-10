@@ -3,13 +3,20 @@ import requests
 import pytest
 from pymongo import MongoClient
 
-from api_helpers.const_and_func import BASE_URL, SERVER_ADDRESS, check_response
+from api_helpers.const_and_func import check_response
 from api_helpers.wrapper import MainWrapper
 
 
+def pytest_addoption(parser):
+    parser.addoption("--ip", action="store", default="localhost")
+
 @pytest.fixture
-def clear_users_from_mongo():
-    client = MongoClient(f'mongodb://{SERVER_ADDRESS}', 27017)
+def ip(request):
+    return request.config.getoption("--ip")
+
+@pytest.fixture
+def clear_users_from_mongo(ip):
+    client = MongoClient(f'mongodb://{ip}', 27017)
     db = client.mestodb
     collection = db["users"]
     collection.delete_many({})
@@ -19,10 +26,14 @@ def clear_users_from_mongo():
     else:
         logging.info("Setup: not all users are deleted")
 
+@pytest.fixture
+def base_url(ip):
+    return f'http://{ip}:3003'
+
 
 @pytest.fixture
-def signup(clear_users_from_mongo):
-    url = BASE_URL +'/signup'
+def signup(clear_users_from_mongo, base_url):
+    url = f'{base_url}/signup'
     headers = {"Content-Type": "application/json"}
     payload = {"email":"user@user.com", "password":"password"}
     resp = requests.post(url, headers = headers, json=payload)
@@ -32,17 +43,18 @@ def signup(clear_users_from_mongo):
 
 
 @pytest.fixture
-def client(signup):
+def client(signup, base_url):
     cl = MainWrapper()
+    cl.base_url = base_url
     cl.url =  cl.base_url +'/signin'
     cl.data = {"email":"user@user.com", "password":"password"
     }
+
     resp = cl.POST()
     check_response(resp.status_code, 200, resp_text=resp.text)
     logging.info(f"User with {cl.data} is created")
     token = resp.json().get("token")
     cl.headers["Cookie"] = f"jwt={token}; path=/; HttpOnly"
-    cl.token = token
     return cl
 
 

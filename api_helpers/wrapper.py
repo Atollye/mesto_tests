@@ -1,13 +1,10 @@
 
 import requests
 
-from api_helpers.const_and_func import BASE_URL
-
-
 class MainWrapper:
 
     def __init__(self):
-        self.base_url = BASE_URL
+        self.base_url = ''
         self.url = ''
         self.token = None
         self.headers = {}

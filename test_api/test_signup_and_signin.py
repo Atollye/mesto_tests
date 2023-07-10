@@ -1,23 +1,28 @@
 import pytest
 import requests
-from api_helpers.const_and_func import BASE_URL, check_response
+from api_helpers.const_and_func import check_response
 from api_helpers.wrapper import MainWrapper
 
 INVALID_JSON = """{"email":"user2@user2.com","password":"testpasswd}}"""
 
-
 @pytest.fixture
-def non_auth_client():
+def non_auth_client(base_url):
     cl = MainWrapper()
+    cl.base_url = base_url
     return cl
 
-def test_signup_with_invalid_json():
-    url = BASE_URL + '/signup'
+
+def test_signup_with_invalid_json(base_url):
+    url = base_url + '/signup'
     headers = {
         "Content-Type": "application/json"
     }
     payload = INVALID_JSON
     resp = requests.post(url, headers=headers, data=payload)
+    assert resp.status_code == 400
+    assert resp.json() == {'message': 'Unexpected end of JSON input'}, (
+        "Wrong message text for invalid input"
+    )
 
 
 @pytest.mark.parametrize("mail, expected_user_mail", [
