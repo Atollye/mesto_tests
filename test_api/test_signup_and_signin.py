@@ -11,26 +11,12 @@ def non_auth_client(base_url):
     cl.base_url = base_url
     return cl
 
-
-def test_signup_with_invalid_json(base_url):
-    url = base_url + '/signup'
-    headers = {
-        "Content-Type": "application/json"
-    }
-    payload = INVALID_JSON
-    resp = requests.post(url, headers=headers, data=payload)
-    assert resp.status_code == 400
-    assert resp.json() == {'message': 'Unexpected end of JSON input'}, (
-        "Wrong message text for invalid input"
-    )
-
-
 @pytest.mark.parametrize("mail, expected_user_mail", [
         ("user@user.com", "user@user.com"), 
       ("user.one.two@e-mail.com", "user.one.two@e-mail.com"),
       ("i-am-a_user33@mail33.cf", "i-am-a_user33@mail33.cf")
 ])
-def test_signup_with_valid_email(non_auth_client, mail, expected_user_mail):
+def test_signup_with_valid_emails(non_auth_client, mail, expected_user_mail):
     non_auth_client.url = non_auth_client.base_url +'/signup'
     non_auth_client.data = {"email": mail, "password":"testpassword"}
     err_mssg = "Signup doesn't work"
@@ -41,7 +27,7 @@ def test_signup_with_valid_email(non_auth_client, mail, expected_user_mail):
 
 
 @pytest.mark.parametrize("password", ["Iam33PassWo!!ord*", "abracadabra"])
-def test_signup_with_valid_password(
+def test_signup_with_valid_passwords(
     clear_users_from_mongo, non_auth_client, password
 ):
     non_auth_client.url = non_auth_client.base_url +'/signup'

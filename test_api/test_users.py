@@ -22,14 +22,7 @@ def generate_several_users(base_url):
         )
         logging.info(f"User with {user} is created")
 
-@pytest.fixture
-def get_users_from_mongo(ip):
-    client = MongoClient(f'mongodb://{ip}', 27017)
-    db = client.mestodb
-    collection = db["users"]
-    users= collection.find()
-    for user in users:
-        print(user)
+
 
 
 
@@ -63,6 +56,6 @@ def test_patch_current_user(client):
     is_patched = wait_while(patch_users)
     assert is_patched, "It's impossible to patch a user"
     resp = client.GET().json()
-    for k, v in updates.items():
+    for k, v in updates.items(  ):
         assert resp.get(k) == v, "The user is patched incorrectly"
 

@@ -8,11 +8,25 @@ from api_helpers.wrapper import MainWrapper
 
 
 def pytest_addoption(parser):
-    parser.addoption("--ip", action="store", default="localhost")
+    parser.addoption("--ip", action="store", default="91.222.238.238")
 
 @pytest.fixture
 def ip(request):
     return request.config.getoption("--ip")
+
+@pytest.fixture
+def base_url(ip):
+    return f'http://{ip}:3003'
+
+@pytest.fixture
+def get_users_from_mongo(ip):
+    client = MongoClient(f'mongodb://{ip}', 27017)
+    db = client.mestodb
+    collection = db["users"]
+    users= collection.find()
+    for user in users:
+        print(user)
+
 
 @pytest.fixture
 def clear_users_from_mongo(ip):
@@ -26,13 +40,11 @@ def clear_users_from_mongo(ip):
     else:
         logging.info("Setup: not all users are deleted")
 
-@pytest.fixture
-def base_url(ip):
-    return f'http://{ip}:3003'
+
 
 
 @pytest.fixture
-def signup(clear_users_from_mongo, base_url):
+def basic_signup(clear_users_from_mongo, base_url):
     url = f'{base_url}/signup'
     headers = {"Content-Type": "application/json"}
     payload = {"email":"user@user.com", "password":"password"}
@@ -43,13 +55,12 @@ def signup(clear_users_from_mongo, base_url):
 
 
 @pytest.fixture
-def client(signup, base_url):
+def client(basic_signup, base_url):
     cl = MainWrapper()
     cl.base_url = base_url
     cl.url =  cl.base_url +'/signin'
     cl.data = {"email":"user@user.com", "password":"password"
     }
-
     resp = cl.POST()
     check_response(resp.status_code, 200, resp_text=resp.text)
     logging.info(f"User with {cl.data} is created")
