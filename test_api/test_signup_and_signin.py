@@ -9,7 +9,7 @@ class TestSignup:
         ("i-am-a_user33@mail33.cf", "i-am-a_user33@mail33.cf")
     ])
     def test_signup_with_valid_emails(
-        clear_users_from_mongo, cl, mail, expected_user_mail
+        self, clear_users_from_mongo, cl, mail, expected_user_mail
     ):
         cl.set_path('/signup')
         cl.data = {"email": mail, "password": "testpassword"}
@@ -21,7 +21,7 @@ class TestSignup:
 
     @pytest.mark.parametrize("password", ["Iam33PassWo!!ord*", "abracadabra"])
     def test_signup_with_valid_passwords(
-        clear_users_from_mongo, cl, password
+        self, clear_users_from_mongo, cl, password
     ):
         cl.set_path('/signup')
         cl.data = {"email": "user@user.com", "password": password}
