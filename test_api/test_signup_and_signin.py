@@ -3,10 +3,8 @@ import requests
 from api_helpers.helper_functions import check_response
 from api_helpers.wrapper import MainWrapper
 
-INVALID_JSON = """{"email":"user2@user2.com","password":"testpasswd}}"""
-
 @pytest.fixture
-def non_auth_client(base_url):
+def non_auth_client(clear_users_from_mongo, base_url):
     cl = MainWrapper()
     cl.base_url = base_url
     return cl

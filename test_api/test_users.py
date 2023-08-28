@@ -38,7 +38,7 @@ def client_as_user_one(base_url):
     return cl
 
 class TestGetUsers():
-    def test_get_users_valid_values(client, generate_several_users):
+    def test_get_users_valid_values(self, client, generate_several_users):
         client.url = client.base_url +'/users'
         resp = client.GET()
         check_response(resp.status_code, 200, resp.text)
@@ -57,7 +57,6 @@ class TestGetUsers():
         cl.id(user_id)
         resp = cl.GET()
         check_response(resp.status_code, 200)
-        print(resp.json()["_id"])
         assert resp.json()["_id"] == user_id, "It's impossible to get users by id"
         
 
