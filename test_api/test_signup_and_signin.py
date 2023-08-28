@@ -1,6 +1,6 @@
 import pytest
 import requests
-from api_helpers.const_and_func import check_response
+from api_helpers.helper_functions import check_response
 from api_helpers.wrapper import MainWrapper
 
 INVALID_JSON = """{"email":"user2@user2.com","password":"testpasswd}}"""
