@@ -78,6 +78,16 @@ class TestPatchUsers():
         for k, v in updates.items():
             assert resp.get(k) == v, "The user is patched incorrectly"
 
-    def test_patch_user_empty_params(self):
+    def test_patch_user_empty_params(self, client):
+        client.set_path("/users/me")
         updates = {"name":"","about":""}
-        assert True
+        client.data = updates
+        resp = client.PATCH()
+        check_response(
+            resp.status_code, 400, resp_text=(
+                "Можно пропатчить пользователя пустым параметром"
+        ))
+        returned_err = resp.json()["validation"]["body"]["message"]
+        assert (
+            returned_err == '"name" is not allowed to be empty'
+        )
